@@ -1,0 +1,148 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    width: 260px;
+    background: #1b1714;
+    color: #dcdcdc;
+    font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+    font-size: 12px;
+}
+
+.panel {
+    padding: 16px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 52px 1fr 36px;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.row:first-child {
+    margin-top: 0;
+}
+
+.label {
+    color: #8c8580;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-size: 10px;
+}
+
+.bar {
+    height: 8px;
+    border-radius: 4px;
+    background: #3a2e28;
+    overflow: hidden;
+}
+
+.fill {
+    height: 100%;
+    width: 0%;
+    background: #dd8161;
+    transition: width 0.3s ease;
+}
+
+.row.warn .fill {
+    background: #e2483d;
+}
+
+.pct {
+    text-align: right;
+    color: #dcdcdc;
+}
+
+.reset {
+    font-size: 10px;
+    color: #8c8580;
+    margin: 4px 0 0 60px;
+}
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 8px;
+    border-top: 1px solid #28221e;
+}
+
+#updated {
+    font-size: 10px;
+    color: #8c8580;
+}
+
+#refresh-btn {
+    background: none;
+    border: none;
+    color: #8c8580;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 2px;
+    transition: color 0.2s;
+}
+
+#refresh-btn:hover {
+    color: #dd8161;
+}
+
+/* แอนิเมชันปุ่มสปินนิ่งตอนโหลดข้อมูล */
+.spinning {
+    animation: spin 0.6s linear;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* กล่องหน้าต่างจัดการสิทธิ์หลุดล็อกอิน */
+#error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.error-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.error-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #e2483d;
+    margin-bottom: 4px;
+}
+
+.error-text {
+    font-size: 11px;
+    color: #8c8580;
+    line-height: 1.4;
+    margin-bottom: 12px;
+}
+
+#login-btn {
+    background: #dd8161;
+    color: #1b1714;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#login-btn:hover {
+    background: #f49b7a;
+}
