@@ -87,18 +87,18 @@ async function render() {
   const barCurrent = document.getElementById("bar-current");
   const barWeekly = document.getElementById("bar-weekly");
 
-  // แสดงผลหลอดความจุด้วยข้อมูลจริง ค้นหา .row อัตโนมัติจากโค้ดเบื้องหลัง
+  // แสดงผลหลอดความจุด้วยข้อมูลจริง ค้นหา .metric อัตโนมัติจากโค้ดเบื้องหลัง
   applyBar(
     barCurrent,
     document.getElementById("pct-current"),
-    barCurrent ? barCurrent.closest(".row") : null,
+    barCurrent ? barCurrent.closest(".metric") : null,
     fiveHour.utilization,
   );
 
   applyBar(
     barWeekly,
     document.getElementById("pct-weekly"),
-    barWeekly ? barWeekly.closest(".row") : null,
+    barWeekly ? barWeekly.closest(".metric") : null,
     sevenDay.utilization,
   );
 
