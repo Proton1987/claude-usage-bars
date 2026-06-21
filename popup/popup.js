@@ -4,6 +4,10 @@ let activeIntervals = {
   weekly: null,
 };
 
+// เกณฑ์ความสดของข้อมูลสำหรับจุดสถานะ (sync-dot) ที่ footer
+const FRESH_MS = 90 * 1000; // poll ทุก 1 นาที เผื่อ buffer ไว้ 90 วิ
+const STALE_MS = 5 * 60 * 1000; // เกินนี้ถือว่าผิดปกติ น่าจะมีปัญหา
+
 function updateCountdown(isoString, elementId, intervalKey) {
   // ล้าง Interval เก่าเฉพาะของช่องนั้นๆ ก่อนเริ่มนับใหม่ ป้องกันการวิ่งซ้อนกัน
   if (activeIntervals[intervalKey]) {
@@ -52,7 +56,39 @@ function applyBar(fillEl, pctEl, rowEl, pct) {
   if (rowEl) rowEl.classList.toggle("warn", value >= 90);
 }
 
+// อ่านสถานะข้อมูลล่าสุดจาก storage แล้วเปลี่ยนสีจุด sync-dot ตามความสด
+// แยกออกจาก render() เพื่อให้เรียกซ้ำเป็นระยะได้โดยไม่ต้อง force-poll API ใหม่ทุกครั้ง
+async function updateSyncStatus() {
+  const dot = document.getElementById("sync-dot");
+  if (!dot) return;
+
+  const { usageError, lastUpdated } = await chrome.storage.local.get([
+    "usageError",
+    "lastUpdated",
+  ]);
+
+  dot.classList.remove("fresh", "stale", "error");
+
+  if (usageError) {
+    dot.classList.add("error");
+    return;
+  }
+
+  if (!lastUpdated) return; // ยังไม่เคยโหลดข้อมูลสำเร็จ ใช้สีพื้นฐานไปก่อน
+
+  const ageMs = Date.now() - lastUpdated;
+  if (ageMs < FRESH_MS) {
+    dot.classList.add("fresh");
+  } else if (ageMs < STALE_MS) {
+    dot.classList.add("stale");
+  } else {
+    dot.classList.add("error");
+  }
+}
+
 async function render() {
+  updateSyncStatus(); // ยิงคู่ขนานไปเลย ไม่ต้องรอ ไม่กระทบ flow หลัก
+
   const { usageData, usageError, lastUpdated } = await chrome.storage.local.get(
     ["usageData", "usageError", "lastUpdated"],
   );
@@ -116,11 +152,23 @@ async function render() {
 document.addEventListener("DOMContentLoaded", () => {
   render();
 
+  // จุด sync-dot อัปเดตสถานะความสดของตัวเองทุก 15 วิ ระหว่างที่ popup เปิดค้างอยู่
+  // (อ่านจาก storage เฉยๆ ไม่ได้ยิง API ใหม่ จึงเบามาก)
+  setInterval(updateSyncStatus, 15000);
+
   // จัดการเหตุการณ์เมื่อคลิกปุ่มไปหน้าล็อกอิน
   const loginBtn = document.getElementById("login-btn");
   if (loginBtn) {
     loginBtn.addEventListener("click", () => {
       chrome.tabs.create({ url: "https://claude.ai/" });
+    });
+  }
+
+  // เปิดหน้า Options สำหรับตั้งค่าเกณฑ์แจ้งเตือน
+  const settingsBtn = document.getElementById("settings-btn");
+  if (settingsBtn) {
+    settingsBtn.addEventListener("click", () => {
+      chrome.runtime.openOptionsPage();
     });
   }
 

@@ -57,7 +57,11 @@ body {
     width: 220px;
     height: 140px;
     transform: translateX(-50%);
-    background: radial-gradient(closest-side, var(--ember-glow), transparent 70%);
+    background: radial-gradient(
+        closest-side,
+        var(--ember-glow),
+        transparent 70%
+    );
     opacity: 0.25;
     pointer-events: none;
     z-index: 0;
@@ -100,6 +104,12 @@ body {
     font-weight: 600;
     letter-spacing: 0.12em;
     color: var(--text-muted);
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
 }
 
 .icon-btn {
@@ -330,12 +340,31 @@ body {
     border-top: 1px solid var(--border-soft);
 }
 
+/* จุดสถานะข้อมูล ผูกกับเวลาที่อัปเดตล่าสุดจริงๆ ผ่าน popup.js */
 .sync-dot {
     width: 5px;
     height: 5px;
     border-radius: 50%;
     background: var(--text-dim);
     flex-shrink: 0;
+    transition: background 0.25s ease;
+}
+
+.sync-dot.fresh {
+    background: var(--steel-bright);
+    box-shadow: 0 0 6px var(--steel-glow);
+    animation: pulse 2.4s ease-in-out infinite;
+}
+
+.sync-dot.stale {
+    background: var(--ember);
+    box-shadow: 0 0 4px var(--ember-glow);
+}
+
+.sync-dot.error {
+    background: var(--warn);
+    box-shadow: 0 0 6px var(--warn-glow);
+    animation: pulse 1.1s ease-in-out infinite;
 }
 
 #updated {
