@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="th">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" href="popup.css" />
+    </head>
+    <body>
+        <div class="panel">
+            <div id="main-content">
+                <div class="row">
+                    <span class="label">Current</span>
+                    <div class="bar">
+                        <div id="bar-current" class="fill"></div>
+                    </div>
+                    <span id="pct-current" class="pct">--%</span>
+                </div>
+                <div class="reset" id="reset-current">—</div>
+
+                <div class="row">
+                    <span class="label">Weekly</span>
+                    <div class="bar">
+                        <div id="bar-weekly" class="fill"></div>
+                    </div>
+                    <span id="pct-weekly" class="pct">--%</span>
+                </div>
+                <div class="reset" id="reset-weekly">—</div>
+            </div>
+
+            <div id="error-container" style="display: none">
+                <div class="error-icon">🔒</div>
+                <div class="error-title">เซสชันของคุณหมดอายุ</div>
+                <div class="error-text">
+                    กรุณาเข้าสู่ระบบที่หน้าเว็บ Claude
+                    อีกครั้งเพื่อดึงข้อมูลโควตา
+                </div>
+                <button id="login-btn">เข้าสู่ระบบ Claude.ai</button>
+            </div>
+
+            <div class="footer">
+                <span id="updated">—</span>
+                <button id="refresh-btn" title="โหลดข้อมูลใหม่">🔄</button>
+            </div>
+        </div>
+        <script src="popup.js"></script>
+    </body>
+</html>
