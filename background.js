@@ -6,19 +6,32 @@ const DEFAULT_NOTIFICATIONS_ENABLED = true;
 
 console.log("[Claude Extension] Background script started!");
 
-async function getOrgId() {
-  const stored = await chrome.storage.local.get("claudeOrgId");
-  if (stored.claudeOrgId) return stored.claudeOrgId;
+function normalizePct(raw) {
+  if (raw === null || raw === undefined) return null;
+  return raw <= 1.0 ? raw * 100 : raw;
+}
 
+async function getOrgId() {
   const cookie = await chrome.cookies.get({
     url: "https://claude.ai",
     name: "lastActiveOrg",
   });
-  if (cookie && cookie.value) {
-    await chrome.storage.local.set({ claudeOrgId: cookie.value });
-    return cookie.value;
+  const cookieOrgId = cookie?.value ?? null;
+  const stored = await chrome.storage.local.get("claudeOrgId");
+
+  if (!cookieOrgId) {
+    if (stored.claudeOrgId) {
+      await chrome.storage.local.remove("claudeOrgId");
+      console.log("[Claude Extension] OrgId cleared — user logged out");
+    }
+    return null;
   }
-  return null;
+
+  if (stored.claudeOrgId !== cookieOrgId) {
+    await chrome.storage.local.set({ claudeOrgId: cookieOrgId });
+  }
+
+  return cookieOrgId;
 }
 
 async function fetchUsage(orgId) {
@@ -42,15 +55,13 @@ function formatBadge(pct) {
   return `${Math.round(pct)}%`;
 }
 
-// สีของ badge อ้างอิงโทนเดียวกับธีม ember / steel / warn ใน popup
 function badgeColor(pct) {
-  if (pct >= 90) return "#FF5C46"; // วิกฤต — warn
-  if (pct >= 50) return "#E2895A"; // กำลังใกล้ — ember
-  return "#4FA8A2"; // สบายๆ — steel
+  if (pct >= 90) return "#FF5C46";
+  if (pct >= 50) return "#E2895A";
+  return "#4FA8A2";
 }
 
-// ฟังก์ชันส่งการแจ้งเตือนพุชหน้าจอคอมพิวเตอร์
-// แจ้งเตือนแค่ "ครั้งเดียวต่อรอบ reset" กันสแปม แทนที่จะดักทุกครั้งที่ % ขยับ
+// แจ้งเตือนครั้งเดียวต่อรอบ reset — ยิงครั้งเดียว ไม่มี fallback ไม่สแปม
 async function checkAndNotify(currentPct, resetsAt) {
   const {
     notifyThreshold = DEFAULT_NOTIFY_THRESHOLD,
@@ -65,40 +76,39 @@ async function checkAndNotify(currentPct, resetsAt) {
   if (!notificationsEnabled) return;
   if (currentPct < notifyThreshold) return;
 
-  // ใช้เวลา reset ของรอบนั้นเป็น key กันแจ้งซ้ำ ถ้า resets_at หาไม่เจอให้ fallback เป็นค่าคงที่
   const windowKey = resetsAt ?? "unknown-window";
-  if (lastNotifiedResetAt === windowKey) return; // แจ้งไปแล้วในรอบนี้
+  if (lastNotifiedResetAt === windowKey) return;
 
-  chrome.notifications.create(
-    "claude-warning",
-    {
-      type: "basic",
-      // 🛠️ แก้ไข Path ตรงนี้ให้ชี้จาก Root ของ Extension โดยตรง ไม่ใช้ ../
-      iconUrl: "assets/icon128.png",
-      title: "🚨 โควตา Claude ใกล้เต็มแล้ว!",
-      message: `ขณะนี้คุณใช้โควตาไปแล้ว ${Math.round(currentPct)}% เกินเกณฑ์ที่ตั้งไว้ (${notifyThreshold}%) แนะนำให้ระวังการส่งโค้ดชุดใหญ่ครับ`,
-      priority: 2,
-    },
-    (notificationId) => {
-      // ดักจับเคส Error หากหาไฟล์ภาพไอคอนไม่เจอจริงๆ เพื่อไม่ให้เบื้องหลังระเบิดพัง
-      if (chrome.runtime.lastError) {
-        console.warn(
-          "[Claude Extension] Notification Icon Error, retrying without custom icon...",
-        );
-        // ถ้ารูปโหลดไม่ได้ ให้ยิงตัวเปล่าโดยใช้ไอคอนระบบแทน
-        chrome.notifications.create("claude-warning-fallback", {
-          type: "basic",
-          iconUrl:
-            "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='128' height='128'><rect width='128' height='128' fill='%23FF5C46'/></svg>",
-          title: "🚨 โควตา Claude ใกล้เต็มแล้ว!",
-          message: `ขณะนี้คุณใช้โควตาไปแล้ว ${Math.round(currentPct)}% เกินเกณฑ์ที่ตั้งไว้ (${notifyThreshold}%)`,
-          priority: 2,
-        });
-      }
-    },
+  // clear ก่อนกัน duplicate ID silent fail
+  await new Promise((r) =>
+    chrome.notifications.clear("claude-warning", () => r()),
   );
 
-  await chrome.storage.local.set({ lastNotifiedResetAt: windowKey });
+  await new Promise((resolve) => {
+    chrome.notifications.create(
+      "claude-warning",
+      {
+        type: "basic",
+        iconUrl: "assets/icon128.png",
+        title: "🚨 โควตา Claude ใกล้เต็มแล้ว!",
+        message: `ใช้ไปแล้ว ${Math.round(currentPct)}% เกินเกณฑ์ที่ตั้งไว้ (${notifyThreshold}%) แนะนำให้ระวังการส่งโค้ดชุดใหญ่ครับ`,
+        priority: 2,
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          console.warn(
+            "[Claude Extension] Notification failed:",
+            chrome.runtime.lastError.message,
+          );
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      },
+    );
+  }).then((ok) => {
+    if (ok) chrome.storage.local.set({ lastNotifiedResetAt: windowKey });
+  });
 }
 
 async function pollUsage() {
@@ -112,11 +122,28 @@ async function pollUsage() {
     }
 
     const data = await fetchUsage(orgId);
-    const fiveHourPct = data?.five_hour?.utilization ?? null;
-    const fiveHourResetsAt = data?.five_hour?.resets_at ?? null;
+
+    const normalizedData = {
+      ...data,
+      five_hour: data?.five_hour
+        ? {
+            ...data.five_hour,
+            utilization: normalizePct(data.five_hour.utilization),
+          }
+        : undefined,
+      seven_day: data?.seven_day
+        ? {
+            ...data.seven_day,
+            utilization: normalizePct(data.seven_day.utilization),
+          }
+        : undefined,
+    };
+
+    const fiveHourPct = normalizedData?.five_hour?.utilization ?? null;
+    const fiveHourResetsAt = normalizedData?.five_hour?.resets_at ?? null;
 
     await chrome.storage.local.set({
-      usageData: data,
+      usageData: normalizedData,
       usageError: null,
       lastUpdated: Date.now(),
     });
@@ -130,6 +157,7 @@ async function pollUsage() {
       await checkAndNotify(fiveHourPct, fiveHourResetsAt);
     }
   } catch (err) {
+    console.error("[Claude Extension] pollUsage error:", err);
     await chrome.storage.local.set({ usageError: err.message });
     await chrome.action.setBadgeText({ text: "!" });
     await chrome.action.setBadgeBackgroundColor({ color: "#FF5C46" });
