@@ -399,3 +399,32 @@ body {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* ── append ต่อท้าย popup.css เดิม ── */
+
+/* sparkline */
+.sparkline-wrap {
+    position: relative;
+    margin: 4px 0 2px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sparkline-wrap canvas {
+    display: block;
+    width: 100%;
+    height: 36px;
+}
+
+.sparkline-label {
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(226, 137, 90, 0.45);
+    pointer-events: none;
+}
