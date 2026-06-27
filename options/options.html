@@ -2,191 +2,64 @@
 <html lang="th">
     <head>
         <meta charset="utf-8" />
-        <link rel="stylesheet" href="popup.css" />
+        <title>Claude Usage — ตั้งค่า</title>
+        <link rel="stylesheet" href="options.css" />
     </head>
     <body>
-        <div class="panel">
-            <div class="panel-glow" aria-hidden="true"></div>
-
-            <header class="header">
-                <div class="brand">
-                    <span class="brand-dot" aria-hidden="true"></span>
-                    <span class="brand-text">USAGE MONITOR</span>
-                </div>
-                <div class="header-actions">
-                    <button
-                        id="settings-btn"
-                        class="icon-btn"
-                        title="ตั้งค่า"
-                        aria-label="ตั้งค่า"
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <circle cx="12" cy="12" r="3" />
-                            <path
-                                d="M19.4 13a7.97 7.97 0 0 0 0-2l2.1-1.6-2-3.4-2.5 1a8 8 0 0 0-1.7-1L14.9 2h-3.8l-.4 2.9a8 8 0 0 0-1.7 1l-2.5-1-2 3.4L6.6 11a7.97 7.97 0 0 0 0 2l-2.1 1.6 2 3.4 2.5-1c.5.4 1.1.8 1.7 1l.4 2.9h3.8l.4-2.9c.6-.2 1.2-.6 1.7-1l2.5 1 2-3.4L19.4 13Z"
-                            />
-                        </svg>
-                    </button>
-                    <button
-                        id="refresh-btn"
-                        class="icon-btn"
-                        title="โหลดข้อมูลใหม่"
-                        aria-label="โหลดข้อมูลใหม่"
-                    >
-                        <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path d="M3 12a9 9 0 0 1 15.4-6.4L21 8" />
-                            <path d="M21 3v5h-5" />
-                            <path d="M21 12a9 9 0 0 1-15.4 6.4L3 16" />
-                            <path d="M3 21v-5h5" />
-                        </svg>
-                    </button>
-                </div>
+        <div class="page">
+            <header class="page-header">
+                <span class="brand-dot" aria-hidden="true"></span>
+                <span class="brand-text">CLAUDE USAGE — SETTINGS</span>
             </header>
 
-            <div id="main-content" class="content">
-                <section class="metric" data-tone="ember">
-                    <div class="metric-head">
-                        <div class="metric-label">
-                            <svg
-                                class="metric-icon"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.8"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z" />
-                            </svg>
-                            <span>CURRENT</span>
-                            <span class="metric-sub">5H</span>
+            <section class="card">
+                <div class="card-row">
+                    <div class="card-text">
+                        <div class="card-title">การแจ้งเตือน</div>
+                        <div class="card-desc">
+                            เด้งแจ้งเตือนเมื่อโควตาใกล้เต็ม
                         </div>
-                        <span id="pct-current" class="metric-value">--%</span>
                     </div>
-                    <div class="track">
-                        <div id="bar-current" class="fill"></div>
-                    </div>
-                    <div class="metric-foot">
-                        <svg
-                            class="foot-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <circle cx="12" cy="12" r="9" />
-                            <path d="M12 7v5l3 2" />
-                        </svg>
-                        <span id="reset-current">—</span>
-                    </div>
-                </section>
-
-                <div class="divider" aria-hidden="true"></div>
-
-                <section class="metric" data-tone="steel">
-                    <div class="metric-head">
-                        <div class="metric-label">
-                            <svg
-                                class="metric-icon"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.8"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                            >
-                                <rect
-                                    x="3"
-                                    y="4"
-                                    width="18"
-                                    height="17"
-                                    rx="2"
-                                />
-                                <path d="M3 9h18M8 2v4M16 2v4" />
-                            </svg>
-                            <span>WEEKLY</span>
-                            <span class="metric-sub">7D</span>
-                        </div>
-                        <span id="pct-weekly" class="metric-value">--%</span>
-                    </div>
-                    <div class="track">
-                        <div id="bar-weekly" class="fill"></div>
-                    </div>
-                    <div class="metric-foot">
-                        <svg
-                            class="foot-icon"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="1.8"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <circle cx="12" cy="12" r="9" />
-                            <path d="M12 7v5l3 2" />
-                        </svg>
-                        <span id="reset-weekly">—</span>
-                    </div>
-                </section>
-            </div>
-
-            <div id="error-container" class="error-state" style="display: none">
-                <div class="error-icon">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <rect x="5" y="11" width="14" height="9" rx="2" />
-                        <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-                    </svg>
+                    <label class="switch">
+                        <input type="checkbox" id="notify-toggle" />
+                        <span class="switch-track" aria-hidden="true">
+                            <span class="switch-thumb"></span>
+                        </span>
+                    </label>
                 </div>
-                <div class="error-title">เซสชันของคุณหมดอายุ</div>
-                <div class="error-text">
-                    กรุณาเข้าสู่ระบบที่หน้าเว็บ Claude
-                    อีกครั้งเพื่อดึงข้อมูลโควตา
-                </div>
-                <button id="login-btn" class="btn-primary">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.8"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path
-                            d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"
-                        />
-                    </svg>
-                    เข้าสู่ระบบ Claude.ai
-                </button>
-            </div>
+            </section>
 
-            <footer class="footer">
-                <span id="sync-dot" class="sync-dot" aria-hidden="true"></span>
-                <span id="updated">—</span>
-            </footer>
+            <section class="card" id="threshold-card">
+                <div class="card-title">เกณฑ์แจ้งเตือน</div>
+                <div class="card-desc">
+                    แจ้งเตือนเมื่อใช้โควตา 5 ชั่วโมงเกิน
+                    <span id="threshold-value" class="threshold-value"
+                        >95%</span
+                    >
+                </div>
+                <input
+                    type="range"
+                    id="threshold-slider"
+                    class="slider"
+                    min="50"
+                    max="99"
+                    step="5"
+                    value="95"
+                />
+                <div class="slider-scale">
+                    <span>50%</span>
+                    <span>99%</span>
+                </div>
+                <div class="card-note">
+                    แจ้งเตือนแค่ครั้งเดียวต่อรอบ reset 5 ชั่วโมง ไม่สแปมซ้ำตอน %
+                    ขยับขึ้นลงนิดหน่อย
+                </div>
+            </section>
+
+            <div id="save-indicator" class="save-indicator">บันทึกแล้ว</div>
+
+            <footer class="page-footer">Claude Usage Bars</footer>
         </div>
-        <script src="popup.js"></script>
+        <script src="options.js"></script>
     </body>
 </html>
