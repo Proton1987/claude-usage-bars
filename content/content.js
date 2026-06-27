@@ -20,6 +20,7 @@
 
   const style = document.createElement("style");
   style.textContent = `
+    /* ── dark (default) ── */
     :host {
       --bg-deep: #15100c;
       --border-soft: rgba(255, 255, 255, 0.08);
@@ -42,6 +43,54 @@
       --warn-glow: rgba(255, 92, 70, 0.5);
 
       all: initial;
+    }
+
+    /* ── light: OS preference ── */
+    @media (prefers-color-scheme: light) {
+      :host(.cu-theme-light) {
+        --bg-deep: #faf8f5;
+        --border-soft: rgba(0, 0, 0, 0.08);
+        --track-bg: rgba(0, 0, 0, 0.05);
+
+        --text-primary: #2c1f14;
+        --text-muted: #6b5c50;
+        --text-dim: #a09080;
+
+        --ember: #c96830;
+        --ember-bright: #e2895a;
+        --ember-glow: rgba(201, 104, 48, 0.3);
+
+        --steel: #2d8c86;
+        --steel-bright: #4fa8a2;
+        --steel-glow: rgba(45, 140, 134, 0.3);
+
+        --warn: #d93a26;
+        --warn-bright: #ff5c46;
+        --warn-glow: rgba(217, 58, 38, 0.35);
+      }
+    }
+
+    /* ── light: claude.ai ใส่ class บน <html> ── */
+    :host(.cu-theme-light) {
+      --bg-deep: #faf8f5;
+      --border-soft: rgba(0, 0, 0, 0.08);
+      --track-bg: rgba(0, 0, 0, 0.05);
+
+      --text-primary: #2c1f14;
+      --text-muted: #6b5c50;
+      --text-dim: #a09080;
+
+      --ember: #c96830;
+      --ember-bright: #e2895a;
+      --ember-glow: rgba(201, 104, 48, 0.3);
+
+      --steel: #2d8c86;
+      --steel-bright: #4fa8a2;
+      --steel-glow: rgba(45, 140, 134, 0.3);
+
+      --warn: #d93a26;
+      --warn-bright: #ff5c46;
+      --warn-glow: rgba(217, 58, 38, 0.35);
     }
 
     .cu-root {
@@ -749,6 +798,39 @@
 
   // เผื่อกรณี background ไม่ได้เขียนค่าใหม่นานผิดปกติ (เช่น alarm ค้าง) ให้จุด sync เปลี่ยนสีตามเวลาจริงด้วย
   setInterval(render, 30 * 1000);
+
+  // ── THEME SYNC ───────────────────────────────────────────────────────────
+  // detect light mode จาก claude.ai — ดู class / data attribute บน <html> และ <body>
+  function detectTheme() {
+    const html = document.documentElement;
+    const body = document.body;
+    const isLight =
+      html.classList.contains("light") ||
+      body.classList.contains("light") ||
+      html.getAttribute("data-color-scheme") === "light" ||
+      body.getAttribute("data-color-scheme") === "light" ||
+      html.getAttribute("data-theme") === "light" ||
+      body.getAttribute("data-theme") === "light";
+
+    if (isLight) {
+      host.classList.add("cu-theme-light");
+    } else {
+      host.classList.remove("cu-theme-light");
+    }
+  }
+
+  detectTheme();
+
+  // watch runtime theme changes — user toggles light/dark ใน claude.ai
+  const themeObserver = new MutationObserver(detectTheme);
+  themeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["class", "data-color-scheme", "data-theme"],
+  });
+  themeObserver.observe(document.body, {
+    attributes: true,
+    attributeFilter: ["class", "data-color-scheme", "data-theme"],
+  });
 
   document.documentElement.appendChild(host);
   render();
